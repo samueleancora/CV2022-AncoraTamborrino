@@ -33,8 +33,8 @@ image_df = pd.concat([filepaths, labels], axis=1)
 ###############################################################################################
 # This may be useful in order to take out from the labeling the images with unwanted names.   #
 # Since we have a small number (~40) images called like CUNWCB, we may think to drop them.    #
-image_df['Label'] = image_df['Label'].apply(lambda x: np.NaN if x[-3:] == 'png' else x)  #
-image_df = image_df.dropna(axis=0)  #
+image_df['Label'] = image_df['Label'].apply(lambda x: np.NaN if x[-3:] == 'png' else x)       #
+image_df = image_df.dropna(axis=0)                                                            #
 # print(image_df)                                                                             #
 ###############################################################################################
 
