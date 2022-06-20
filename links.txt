@@ -1,1 +1,3 @@
-https://www.kaggle.com/datasets/sripaadsrinivasan/fish-species-image-data
+https://www.kaggle.com/datasets/sripaadsrinivasan/fish-species-image-data   ----    Dataset
+
+https://www.youtube.com/watch?v=E_3-9sGq7jk     ----    Useful tutorial
