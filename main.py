@@ -12,7 +12,7 @@ def join_tuple_string(strings_tuple) -> str:
 
 
 # Selected one of the three directory in order to single taking each species
-image_dir = Path('/Users/micheletamborrino/Desktop/Fish_Data/images/cropped')
+image_dir = Path('/Users/samueleancora/Downloads/Fish_Data/images/cropped')
 print("Image dir:" + str(image_dir))
 
 # Take all the objects that have anything in the name and ends with .png
@@ -47,7 +47,7 @@ train_df, test_df = train_test_split(image_df, train_size=0.7, shuffle=True, ran
 # This is responsible for image augmentation
 train_generator = tf.keras.preprocessing.image.ImageDataGenerator(
     preprocessing_function=tf.keras.applications.mobilenet_v2.preprocess_input,
-    validation_split=0.25
+    validation_split=0.4
 )
 
 test_generator = tf.keras.preprocessing.image.ImageDataGenerator(
@@ -134,7 +134,7 @@ history = model.fit(
 
 print("Im evaluating...\n")
 
-result = model.evaluate(train_images)
+result = model.evaluate(val_images)
 print(result)
 print("    Test loss: {:.5f}".format(result[0]))
 print("Test accuracy: {:.2f}%".format(result[1] * 100))
@@ -157,18 +157,18 @@ plt.legend(['train', 'test'], loc='upper left')
 plt.savefig('plots/model_loss.png')
 plt.show()
 
-# test_images.reset()
-# pred = model.predict_generator(test_images,
-#                                steps=test_images.n // test_images.batch_size,
-#                                verbose=1)
-#
-# predicted_class_indices = np.argmax(pred, axis=1)
-#
-# labels = train_images.class_indices
-# labels = dict((v, k) for k, v in labels.items())
-# predictions = [labels[k] for k in predicted_class_indices]
-#
-# filenames = test_images.filenames
-# results = pd.DataFrame({"Filename": filenames,
-#                         "Predictions": predictions})
-# results.to_csv("results.csv", index=False)
+test_images.reset()
+pred = model.predict(test_images,
+                     steps=test_images.n // test_images.batch_size,
+                     verbose=1)
+
+predicted_class_indices = np.argmax(pred, axis=1)
+
+labels = train_images.class_indices
+labels = dict((v, k) for k, v in labels.items())
+predictions = [labels[k] for k in predicted_class_indices]
+
+filenames = test_images.filenames
+results = pd.DataFrame({"Filename": filenames,
+                        "Predictions": predictions})
+results.to_csv("results.csv", index=False)
