@@ -12,7 +12,7 @@ def join_tuple_string(strings_tuple) -> str:
 
 
 # Selected one of the three directory in order to single taking each species
-image_dir = Path('/Users/samueleancora/Downloads/Fish_Data/images/cropped')
+image_dir = Path('/Users/micheletamborrino/Desktop/Fish_Data/images/cropped')
 print("Image dir:" + str(image_dir))
 
 # Take all the objects that have anything in the name and ends with .png
