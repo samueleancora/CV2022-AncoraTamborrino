@@ -12,12 +12,14 @@ def join_tuple_string(strings_tuple) -> str:
 
 # Selected one of the three directory in order to single taking each species
 image_dir = Path('/Users/samueleancora/Downloads/Fish_Data/images/cropped')
+print("Image dir:" + str(image_dir))
 
 # Take all the objects that have anything in the name and ends with .png
 filepaths = list(image_dir.glob(r'**/*.png'))
 
 # Uses join_tuple_string that takes as argument the list of the tuples containing the species's name
 labels = list(map(join_tuple_string, list(map(lambda x: os.path.split(x)[1].split("_", 2)[:2], filepaths))))
+print("I found " + str(len(labels)) + " elements.")
 
 # Creates a sort of column in a table
 filepaths = pd.Series(filepaths, name='Filepath').astype(str)
@@ -106,12 +108,14 @@ outputs = tf.keras.layers.Dense(477, activation='softmax')(x)
 
 model = tf.keras.Model(inputs=inputs, outputs=outputs)
 
+print("I'm compiling...\n")
 model.compile(
     optimizer='adam',
     loss='categorical_crossentropy',
     metrics=['accuracy'],
 )
 
+print("I'm fitting...\n")
 history = model.fit(
     train_images,
     validation_data=val_images,
@@ -124,3 +128,9 @@ history = model.fit(
         )
     ]
 )
+
+print("Im evaluating...\n")
+
+result = model.evaluate(test_images, verbose='auto')
+print("    Test loss: {:.5f}".format(result[0]))
+print("Test accuracy: {:.2f}%".format(result[1] * 100))
