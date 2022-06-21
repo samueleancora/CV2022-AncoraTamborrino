@@ -3,12 +3,11 @@ import pandas as pd
 from pathlib import Path
 import os.path
 from sklearn.model_selection import train_test_split
-from tensorflow.compat.v1 import ConfigProto
-from tensorflow.compat.v1 import InteractiveSession
 import tensorflow as tf
 
-
-
+gpus = tf.config.experimental.list_physical_devices('GPU')
+print(gpus)
+#tf.config.experimental.set_memory_growth(gpus[0], True)
 
 def join_tuple_string(strings_tuple) -> str:
     return ' '.join(strings_tuple)
@@ -33,8 +32,8 @@ image_df = pd.concat([filepaths, labels], axis=1)
 ###############################################################################################
 # This may be useful in order to take out from the labeling the images with unwanted names.   #
 # Since we have a small number (~40) images called like CUNWCB, we may think to drop them.    #
-image_df['Label'] = image_df['Label'].apply(lambda x: np.NaN if x[-3:] == 'png' else x)       #
-image_df = image_df.dropna(axis=0)                                                            #
+image_df['Label'] = image_df['Label'].apply(lambda x: np.NaN if x[-3:] == 'png' else x)  #
+image_df = image_df.dropna(axis=0)  #
 # print(image_df)                                                                             #
 ###############################################################################################
 
@@ -59,7 +58,7 @@ train_images = train_generator.flow_from_dataframe(
     dataframe=train_df,
     x_col='Filepath',
     y_col='Label',
-    target_size=(250, 250),
+    target_size=(224, 224),
     color_mode='rgb',
     class_mode='categorical',
     batch_size=32,
@@ -72,7 +71,7 @@ val_images = train_generator.flow_from_dataframe(
     dataframe=train_df,
     x_col='Filepath',
     y_col='Label',
-    target_size=(250, 250),
+    target_size=(224, 224),
     color_mode='rgb',
     class_mode='categorical',
     batch_size=32,
@@ -85,30 +84,28 @@ test_images = test_generator.flow_from_dataframe(
     dataframe=test_df,
     x_col='Filepath',
     y_col='Label',
-    target_size=(250, 250),
+    target_size=(224, 224),
     color_mode='rgb',
     class_mode='categorical',
     batch_size=32,
     shuffle=False
 )
 
-
-
 # We will use a pre trained model, which is MobileNetV2 transfer CNN model.
-pretraine_model = tf.keras.applications.MobileNetV2(input_shape=(224, 224, 3),
-                                                    include_top=False,
-                                                    weights='imagenet',
-                                                    pooling='avg'
-                                                    )
+pretrained_model = tf.keras.applications.MobileNetV2(input_shape=(224, 224, 3),
+                                                     include_top=False,
+                                                     weights='imagenet',
+                                                     pooling='avg'
+                                                     )
 #
-pretraine_model.trainable = False
+pretrained_model.trainable = False
 
 # By doing this we are able to take the first input layer
-inputs = pretraine_model.input
-x = tf.keras.layers.Dense(128, activation='relu')(pretraine_model.output)
+inputs = pretrained_model.input
+x = tf.keras.layers.Dense(128, activation='relu')(pretrained_model.output)
 x = tf.keras.layers.Dense(128, activation='relu')(x)
 
-outputs = tf.keras.layers.Dense(9, activation='softmax')(x)
+outputs = tf.keras.layers.Dense(477, activation='softmax')(x)
 
 model = tf.keras.Model(inputs=inputs, outputs=outputs)
 
