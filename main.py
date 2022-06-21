@@ -47,7 +47,7 @@ train_df, test_df = train_test_split(image_df, train_size=0.7, shuffle=True, ran
 # This is responsible for image augmentation
 train_generator = tf.keras.preprocessing.image.ImageDataGenerator(
     preprocessing_function=tf.keras.applications.mobilenet_v2.preprocess_input,
-    validation_split=0.2
+    validation_split=0.25
 )
 
 test_generator = tf.keras.preprocessing.image.ImageDataGenerator(
@@ -61,7 +61,7 @@ train_images = train_generator.flow_from_dataframe(
     target_size=(224, 224),
     color_mode='rgb',
     class_mode='categorical',
-    batch_size=50,
+    batch_size=32,
     shuffle=True,
     seed=42,
     subset='training'
@@ -74,7 +74,7 @@ val_images = train_generator.flow_from_dataframe(
     target_size=(224, 224),
     color_mode='rgb',
     class_mode='categorical',
-    batch_size=50,
+    batch_size=32,
     shuffle=True,
     seed=42,
     subset='validation'
@@ -87,7 +87,7 @@ test_images = test_generator.flow_from_dataframe(
     target_size=(224, 224),
     color_mode='rgb',
     class_mode=None,
-    batch_size=50,
+    batch_size=32,
     shuffle=False
 )
 
@@ -121,8 +121,8 @@ model.compile(
 print("I'm fitting...\n")
 history = model.fit(
     train_images,
-    validation_data=val_images,
-    epochs=100,
+    validation_data=train_images,
+    epochs=10,
     callbacks=[
         tf.keras.callbacks.EarlyStopping(
             monitor='val_loss',
@@ -134,7 +134,7 @@ history = model.fit(
 
 print("Im evaluating...\n")
 
-result = model.evaluate(test_images, verbose=0)
+result = model.evaluate(train_images)
 print(result)
 print("    Test loss: {:.5f}".format(result[0]))
 print("Test accuracy: {:.2f}%".format(result[1] * 100))
