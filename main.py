@@ -47,7 +47,7 @@ train_df, test_df = train_test_split(image_df, train_size=0.7, shuffle=True, ran
 # This is responsible for image augmentation
 train_generator = tf.keras.preprocessing.image.ImageDataGenerator(
     preprocessing_function=tf.keras.applications.mobilenet_v2.preprocess_input,
-    validation_split=0.4
+    validation_split=0.3
 )
 
 test_generator = tf.keras.preprocessing.image.ImageDataGenerator(
