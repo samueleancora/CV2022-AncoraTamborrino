@@ -4,6 +4,7 @@ from pathlib import Path
 import os.path
 from sklearn.model_selection import train_test_split
 import tensorflow as tf
+import matplotlib.pyplot as plt
 
 
 def join_tuple_string(strings_tuple) -> str:
@@ -50,7 +51,7 @@ train_generator = tf.keras.preprocessing.image.ImageDataGenerator(
 )
 
 test_generator = tf.keras.preprocessing.image.ImageDataGenerator(
-    preprocessing_function=tf.keras.applications.mobilenet_v2.preprocess_input,
+    preprocessing_function=tf.keras.applications.mobilenet_v2.preprocess_input
 )
 
 train_images = train_generator.flow_from_dataframe(
@@ -60,7 +61,7 @@ train_images = train_generator.flow_from_dataframe(
     target_size=(224, 224),
     color_mode='rgb',
     class_mode='categorical',
-    batch_size=32,
+    batch_size=50,
     shuffle=True,
     seed=42,
     subset='training'
@@ -73,7 +74,7 @@ val_images = train_generator.flow_from_dataframe(
     target_size=(224, 224),
     color_mode='rgb',
     class_mode='categorical',
-    batch_size=32,
+    batch_size=50,
     shuffle=True,
     seed=42,
     subset='validation'
@@ -86,7 +87,7 @@ test_images = test_generator.flow_from_dataframe(
     target_size=(224, 224),
     color_mode='rgb',
     class_mode=None,
-    batch_size=32,
+    batch_size=50,
     shuffle=False
 )
 
@@ -133,7 +134,41 @@ history = model.fit(
 
 print("Im evaluating...\n")
 
-result = model.evaluate(train_images, verbose='auto')
+result = model.evaluate(test_images, verbose=0)
 print(result)
 print("    Test loss: {:.5f}".format(result[0]))
 print("Test accuracy: {:.2f}%".format(result[1] * 100))
+
+plt.plot(history.history['accuracy'])
+plt.plot(history.history['val_accuracy'])
+plt.title('model accuracy')
+plt.ylabel('accuracy')
+plt.xlabel('epoch')
+plt.legend(['train', 'test'], loc='upper left')
+plt.savefig('plots/model_accuracy.png')
+plt.show()
+
+plt.plot(history.history['loss'])
+plt.plot(history.history['val_loss'])
+plt.title('model loss')
+plt.ylabel('loss')
+plt.xlabel('epoch')
+plt.legend(['train', 'test'], loc='upper left')
+plt.savefig('plots/model_loss.png')
+plt.show()
+
+# test_images.reset()
+# pred = model.predict_generator(test_images,
+#                                steps=test_images.n // test_images.batch_size,
+#                                verbose=1)
+#
+# predicted_class_indices = np.argmax(pred, axis=1)
+#
+# labels = train_images.class_indices
+# labels = dict((v, k) for k, v in labels.items())
+# predictions = [labels[k] for k in predicted_class_indices]
+#
+# filenames = test_images.filenames
+# results = pd.DataFrame({"Filename": filenames,
+#                         "Predictions": predictions})
+# results.to_csv("results.csv", index=False)
