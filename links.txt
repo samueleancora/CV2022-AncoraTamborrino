@@ -1,3 +1,5 @@
-Dataset     ---     https://www.kaggle.com/datasets/sripaadsrinivasan/fish-species-image-data
+Dataset                         ---     https://www.kaggle.com/datasets/sripaadsrinivasan/fish-species-image-data
 
-Video       ---     https://www.youtube.com/watch?v=E_3-9sGq7jk
+Video                           ---     https://www.youtube.com/watch?v=E_3-9sGq7jk
+
+Spiegazione del procedimento    ---     https://vijayabhaskar96.medium.com/tutorial-on-keras-flow-from-dataframe-1fd4493d237c

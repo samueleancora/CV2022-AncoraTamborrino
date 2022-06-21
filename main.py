@@ -85,10 +85,12 @@ test_images = test_generator.flow_from_dataframe(
     y_col='Label',
     target_size=(224, 224),
     color_mode='rgb',
-    class_mode='categorical',
+    class_mode=None,
     batch_size=32,
     shuffle=False
 )
+
+print(test_images)
 
 # We will use a pre trained model, which is MobileNetV2 transfer CNN model.
 pretrained_model = tf.keras.applications.MobileNetV2(input_shape=(224, 224, 3),
@@ -131,6 +133,7 @@ history = model.fit(
 
 print("Im evaluating...\n")
 
-result = model.evaluate(test_images, verbose='auto')
+result = model.evaluate(val_images, verbose='auto')
+print(result)
 print("    Test loss: {:.5f}".format(result[0]))
 print("Test accuracy: {:.2f}%".format(result[1] * 100))
