@@ -5,9 +5,6 @@ import os.path
 from sklearn.model_selection import train_test_split
 import tensorflow as tf
 
-gpus = tf.config.experimental.list_physical_devices('GPU')
-print(gpus)
-#tf.config.experimental.set_memory_growth(gpus[0], True)
 
 def join_tuple_string(strings_tuple) -> str:
     return ' '.join(strings_tuple)
