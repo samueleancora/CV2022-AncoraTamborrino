@@ -37,17 +37,26 @@ image_df = image_df.dropna(axis=0)  #
 # print(image_df)                                                                             #
 ###############################################################################################
 
+samples = []
+
+for category in image_df['Label'].unique():
+    category_slice = image_df.query("Label == @category")
+    samples.append(category_slice.sample(20, random_state=1, replace=True))
+
+image_df = pd.concat(samples, axis=0).sample(frac=1.0, random_state=1).reset_index(drop=True)
+print(image_df)
+
 # We may look at the numbers for each species
 print(image_df['Label'].value_counts())
 
 # Create the train and test set
-train_df, test_df = train_test_split(image_df, train_size=0.7, shuffle=True, random_state=1)
+train_df, test_df = train_test_split(image_df, train_size=0.7, shuffle=True, random_state=3)
 
 # This process helps us to not run out of memory, loading an image per time
 # This is responsible for image augmentation
 train_generator = tf.keras.preprocessing.image.ImageDataGenerator(
     preprocessing_function=tf.keras.applications.mobilenet_v2.preprocess_input,
-    validation_split=0.3
+    validation_split=0.2
 )
 
 test_generator = tf.keras.preprocessing.image.ImageDataGenerator(
@@ -86,7 +95,7 @@ test_images = test_generator.flow_from_dataframe(
     y_col='Label',
     target_size=(224, 224),
     color_mode='rgb',
-    class_mode=None,
+    class_mode='categorical',
     batch_size=32,
     shuffle=False
 )
@@ -107,7 +116,7 @@ inputs = pretrained_model.input
 x = tf.keras.layers.Dense(128, activation='relu')(pretrained_model.output)
 x = tf.keras.layers.Dense(128, activation='relu')(x)
 
-outputs = tf.keras.layers.Dense(477, activation='softmax')(x)
+outputs = tf.keras.layers.Dense(479, activation='softmax')(x)
 
 model = tf.keras.Model(inputs=inputs, outputs=outputs)
 
@@ -121,8 +130,8 @@ model.compile(
 print("I'm fitting...\n")
 history = model.fit(
     train_images,
-    validation_data=train_images,
-    epochs=10,
+    validation_data=val_images,
+    epochs=8,
     callbacks=[
         tf.keras.callbacks.EarlyStopping(
             monitor='val_loss',
@@ -132,13 +141,7 @@ history = model.fit(
     ]
 )
 
-print("Im evaluating...\n")
-
-result = model.evaluate(val_images)
-print(result)
-print("    Test loss: {:.5f}".format(result[0]))
-print("Test accuracy: {:.2f}%".format(result[1] * 100))
-
+print("I'm plotting...\n")
 plt.plot(history.history['accuracy'])
 plt.plot(history.history['val_accuracy'])
 plt.title('model accuracy')
@@ -156,6 +159,12 @@ plt.xlabel('epoch')
 plt.legend(['train', 'test'], loc='upper left')
 plt.savefig('plots/model_loss.png')
 plt.show()
+
+print("Im evaluating...\n")
+
+result = model.evaluate(test_images, verbose=0)
+print("    Test loss: {:.5f}".format(result[0]))
+print("Test accuracy: {:.2f}%".format(result[1] * 100))
 
 test_images.reset()
 pred = model.predict(test_images,
