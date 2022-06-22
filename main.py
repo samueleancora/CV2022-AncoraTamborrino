@@ -176,8 +176,12 @@ predicted_class_indices = np.argmax(pred, axis=1)
 labels = train_images.class_indices
 labels = dict((v, k) for k, v in labels.items())
 predictions = [labels[k] for k in predicted_class_indices]
+print("I found " + str(len(labels)) + "labels.")
+print("I found " + str(len(predictions)) + "predictions.")
+
 
 filenames = test_images.filenames
+print(str(filenames.len) + "and" + str(len(predictions)) + "must be equal in order to work.")
 results = pd.DataFrame({"Filename": filenames,
                         "Predictions": predictions})
 results.to_csv("results.csv", index=False)
